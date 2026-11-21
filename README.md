@@ -13,6 +13,11 @@ Video upload
   -> Preview and download
 ```
 
+Face protection is enabled by default. License-plate protection is optional:
+set `PIXORA_PLATE_MODEL=/path/to/verified-plate-model.pt` and install
+Ultralytics. The MVP will not claim plate protection until that model loads
+successfully.
+
 ## Run locally
 
 Backend:

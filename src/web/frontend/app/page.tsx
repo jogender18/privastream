@@ -7,7 +7,11 @@ type ProcessResult = {
   job_id: string;
   output_url: string;
   faces_detected: number;
+  plates_detected: number;
   processed_frames: number;
+  total_frames: number;
+  processing_seconds: number;
+  plate_protection: boolean;
 };
 
 const API_URL =
@@ -74,6 +78,18 @@ export default function Home() {
         </p>
       </section>
 
+      <section className="mb-8 rounded-2xl bg-indigo-50 p-6 text-left dark:bg-indigo-950/30">
+        <h2 className="mb-2 font-bold text-indigo-950 dark:text-indigo-100">
+          How Pixora protects privacy
+        </h2>
+        <p className="text-sm leading-6 text-indigo-900 dark:text-indigo-200">
+          Pixora scans each video frame, identifies visible faces, and replaces
+          those regions with a Gaussian blur. The original upload is deleted
+          after processing; the protected MP4 is retained only for download.
+          Detection is not a guarantee of perfect anonymization.
+        </p>
+      </section>
+
       <section className="rounded-2xl border border-gray-200 p-6 shadow-sm dark:border-gray-800">
         <label className="mb-3 block text-sm font-semibold">Choose a video</label>
         <input
@@ -129,14 +145,28 @@ export default function Home() {
       )}
 
       {result && (
-        <section className="mt-6 grid grid-cols-2 gap-4 text-center">
+        <section className="mt-6 grid grid-cols-2 gap-4 text-center md:grid-cols-4">
           <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-900">
             <p className="text-2xl font-bold">{result.faces_detected}</p>
             <p className="text-sm text-gray-500">Face detections</p>
           </div>
+          {result.plate_protection && (
+            <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-900">
+              <p className="text-2xl font-bold">{result.plates_detected}</p>
+              <p className="text-sm text-gray-500">Plate detections</p>
+            </div>
+          )}
           <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-900">
             <p className="text-2xl font-bold">{result.processed_frames}</p>
-            <p className="text-sm text-gray-500">Frames protected</p>
+            <p className="text-sm text-gray-500">
+              of {result.total_frames} frames
+            </p>
+          </div>
+          <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-900">
+            <p className="text-2xl font-bold">
+              {result.processing_seconds}s
+            </p>
+            <p className="text-sm text-gray-500">Processing time</p>
           </div>
         </section>
       )}

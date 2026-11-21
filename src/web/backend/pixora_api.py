@@ -1,4 +1,5 @@
 import os
+import time
 import uuid
 from pathlib import Path
 
@@ -14,6 +15,7 @@ UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 CORS(
     app,
     origins=[
@@ -29,6 +31,16 @@ face_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
 )
 ALLOWED_EXTENSIONS = {".mp4", ".mov", ".avi", ".webm", ".mkv"}
+plate_model = None
+
+plate_model_path = os.getenv("PIXORA_PLATE_MODEL")
+if plate_model_path and Path(plate_model_path).is_file():
+    try:
+        from ultralytics import YOLO
+
+        plate_model = YOLO(plate_model_path)
+    except Exception:
+        plate_model = None
 
 
 @app.get("/health")
@@ -38,6 +50,7 @@ def health():
 
 @app.post("/api/process-video")
 def process_video():
+    started_at = time.perf_counter()
     video = request.files.get("video")
     if video is None or not video.filename:
         return jsonify({"error": "A video file is required"}), 400
@@ -75,6 +88,7 @@ def process_video():
         return jsonify({"error": "Could not initialize video output"}), 500
 
     face_detections = 0
+    plate_detections = 0
     processed_frames = 0
     frame_number = 0
     last_faces = []
@@ -102,6 +116,31 @@ def process_video():
                 last_faces.append((x1, y1, x2, y2))
                 face_detections += 1
 
+            if plate_model is not None:
+                plate_results = plate_model.predict(
+                    source=frame,
+                    imgsz=640,
+                    conf=0.35,
+                    device="cpu",
+                    verbose=False,
+                )
+                for plate_result in plate_results:
+                    if plate_result.boxes is None:
+                        continue
+                    for box in plate_result.boxes.xyxy.cpu().numpy():
+                        x1, y1, x2, y2 = map(int, box)
+                        padding = 6
+                        x1 = max(0, x1 - padding)
+                        y1 = max(0, y1 - padding)
+                        x2 = min(width, x2 + padding)
+                        y2 = min(height, y2 + padding)
+                        region = frame[y1:y2, x1:x2]
+                        if region.size:
+                            frame[y1:y2, x1:x2] = cv2.GaussianBlur(
+                                region, (99, 99), 30
+                            )
+                        plate_detections += 1
+
         for x1, y1, x2, y2 in last_faces:
             region = frame[y1:y2, x1:x2]
             if region.size:
@@ -114,6 +153,7 @@ def process_video():
 
     capture.release()
     writer.release()
+    input_path.unlink(missing_ok=True)
 
     if processed_frames == 0:
         input_path.unlink(missing_ok=True)
@@ -125,8 +165,11 @@ def process_video():
             "job_id": job_id,
             "output_url": f"/api/output/{job_id}",
             "faces_detected": face_detections,
+            "plates_detected": plate_detections,
             "processed_frames": processed_frames,
             "total_frames": total_frames,
+            "processing_seconds": round(time.perf_counter() - started_at, 2),
+            "plate_protection": plate_model is not None,
         }
     )
 
