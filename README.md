@@ -45,7 +45,4 @@ Open `http://localhost:3000`.
 - `POST /api/process-video` with multipart field `video`
 - `GET /api/output/<job_id>`
 
-## Attribution
 
-This project is derived from
-[PrivaStream](https://github.com/Saximn/privastream), licensed under Apache 2.0.
