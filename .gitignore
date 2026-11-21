@@ -26,3 +26,7 @@ video.log
 # Caches & model artifacts
 *.pack.gz
 *.joblib
+
+# Pixora local runtime
+.venv/
+data/pixora/
