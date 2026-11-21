@@ -3,18 +3,18 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "privastream"
+name = "pixora-shield"
 dynamic = ["version"]
-description = "AI-Powered Privacy Streaming Platform"
+description = "AI-powered privacy protection for shared videos"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [
-    {name = "Privastream Team", email = "team@privastream.ai"}
+    {name = "Pixora Shield Team"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -65,13 +65,11 @@ audio = [
 ]
 
 [project.scripts]
-privastream = "src.cli.main:main"
+pixora-shield = "src.cli.main:main"
 
 [project.urls]
-Homepage = "https://github.com/privastream/tiktok-techjam-2025"
-Documentation = "https://privastream.readthedocs.io"
-Repository = "https://github.com/privastream/tiktok-techjam-2025"
-Issues = "https://github.com/privastream/tiktok-techjam-2025/issues"
+Homepage = "https://github.com/jogender18/privastream"
+Repository = "https://github.com/jogender18/privastream"
 
 [tool.setuptools_scm]
 version_scheme = "post-release"

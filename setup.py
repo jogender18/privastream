@@ -32,19 +32,18 @@ def read_long_description():
     return ""
 
 setup(
-    name="privastream",
+    name="pixora-shield",
     version="1.0.0",
-    author="Privastream Team",
-    author_email="team@privastream.ai",
-    description="AI-Powered Privacy Streaming Platform for real-time PII detection and redaction",
+    author="Pixora Shield Team",
+    description="AI-powered privacy protection for shared videos",
     long_description=read_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/privastream/tiktok-techjam-2025",
+    url="https://github.com/jogender18/privastream",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -78,7 +77,7 @@ setup(
     },
     entry_points={
         "console_scripts": [
-            "privastream=src.cli.main:main",
+            "pixora-shield=src.cli.main:main",
         ],
     },
     include_package_data=True,
